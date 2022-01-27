@@ -3,34 +3,91 @@ var navios = []
 var posicoes = []
 var qtdeLinhas = 15
 var qtdeColunas = 15
+var totalCelulas = qtdeLinhas * qtdeColunas
+var qtdeCelulasClicaveis = totalCelulas
 var tamanhoNavio = 4
 var celulasNavio1 = []
+var score = {
+    municao: 100,
+    pontuacao: 0,
+    sucesso: [],
+    falha: []
+}
+var jogoFinalizado = false
+document.getElementById("progressBar").max = score.municao
+document.getElementById("progressBar").value = score.municao
+setScore()
 
 renderizarPlano()
 definirNavios()
 sentidoDosNavios()
 celulasDosNavios()
+renderizarNavios()
+
+
+function setScore(){
+    document.getElementById("municao").innerText = score.municao
+    document.getElementById("sucesso").innerText = score.sucesso.length
+    document.getElementById("falha").innerText = score.falha.length
+    document.getElementById("progressBar").value = score.municao
+
+    if (score.municao == 0 || score.sucesso.length == (qtdeNavios * tamanhoNavio))
+        finalizarJogo()
+}
 
 
 function atirar(elemento){
-    console.log(elemento)
 
-    var navioEncontrado = false
-
-    navios.map(navio => {
-        navio.celulas.map(celula => {
-            var stringCelula = convertCelulaToString(celula)
-
-            if (elemento == stringCelula) {
-                navioEncontrado = true
-            }
-        })
+    var existe = false
+    score.sucesso.map(celula => {
+        if (celula == elemento)
+            existe = true
+    })
+    score.falha.map(celula => {
+        if (celula == elemento)
+            existe = true
     })
 
-    if (navioEncontrado) {
-        document.getElementById(elemento).className = "cellNavio"
+    if (!existe){
+        var navioEncontrado = false
+        var posicaoNavioEncontrado = ''
+
+        navios.map(navio => {
+            navio.celulas.map(celula => {
+                var stringCelula = convertCelulaToString(celula)
+    
+                if (elemento == stringCelula) {
+                    navioEncontrado = true
+                    posicaoNavioEncontrado = 'n' + String(navios.indexOf(navio)) + '.' + stringCelula
+                    qtdeCelulasClicaveis -= 1
+                }
+            })
+        })
+    
+        if (navioEncontrado) {
+            score.sucesso.push(elemento)
+            document.getElementById(elemento).className = "cellNavio"
+            document.getElementById(posicaoNavioEncontrado).className = "cellNavio"
+        } else {
+            score.falha.push(elemento)
+            document.getElementById(elemento).className = "cellAgua"
+        }
+
+        score.municao -= 1
+        setScore()
+    } 
+}
+
+function finalizarJogo(){
+    document.getElementById("quadroFinal").style.visibility = "visible"
+    document.getElementById("fraseFinal").style.visibility = "visible"
+
+    if (score.sucesso.length == (qtdeNavios * tamanhoNavio)){
+        document.getElementById("fraseFinal").style.color = "green"
+        document.getElementById("fraseFinal").innerText = "Você ganhou!"
     } else {
-        document.getElementById(elemento).className = "cellAgua"
+        document.getElementById("fraseFinal").style.color = "red"
+        document.getElementById("fraseFinal").innerText = "Você perdeu!"
     }
 }
 
@@ -141,6 +198,32 @@ function renderizarPlano() {
         linhas += '</tr>'
     }
     elemento.innerHTML = linhas
+}
+
+function renderizarNavios(){
+    var elemento = document.getElementById('navios')
+    var tabela = ''
+
+    navios.map(navio => {
+        tabela += '\
+        <table style="margin-bottom: 5px;"> \
+            <tr> \
+        '
+
+        console.log(navios.indexOf(navio))
+
+        navio.celulas.map(celula => {
+            tabela += `<td class="cellNavioBranco" id="n${navios.indexOf(navio)}.${celula[0]}.${celula[1]}">
+                
+            </td>`
+        })
+        
+        tabela += '\
+            </tr> \
+        </table> \
+        ' 
+    })
+    elemento.innerHTML = tabela
 }
 
 
