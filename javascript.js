@@ -6,28 +6,37 @@ var qtdeColunas = 15
 var tamanhoNavio = 4
 var celulasNavio1 = []
 
-
-
 renderizarPlano()
 definirNavios()
 sentidoDosNavios()
 celulasDosNavios()
 
-colorirCelulasDosNavios()
 
+function atirar(elemento){
+    console.log(elemento)
 
-function colorirCelulasDosNavios(){
+    var navioEncontrado = false
+
     navios.map(navio => {
         navio.celulas.map(celula => {
-            var stringElemento = String(celula[0]) + '.' + String(celula[1])
-            //console.log(document.getElementById(stringElemento))
-            document.getElementById(stringElemento).className = "cellNavio"
+            var stringCelula = convertCelulaToString(celula)
+
+            if (elemento == stringCelula) {
+                navioEncontrado = true
+            }
         })
     })
+
+    if (navioEncontrado) {
+        document.getElementById(elemento).className = "cellNavio"
+    } else {
+        document.getElementById(elemento).className = "cellAgua"
+    }
 }
 
-
-
+function convertCelulaToString(celula){
+    return String(String(celula[0]).trim() + '.' + String(celula[1]).trim()).trim()
+}
 
 function definirNavios() {
     for (let index = 0; index < qtdeNavios; index++) {
@@ -39,17 +48,22 @@ function definirNavios() {
 }
 
 function colisao(indexNavio) {
+    var retorno = false
+
     for (let index = indexNavio-1; index >= 0; index--) {
         navios[indexNavio].celulas.map(celulaNavioOriginal => {
-            navios[index].celulas.map(celulaNavioRef => {
-                if (celulaNavioOriginal == celulaNavioRef){
+            navios[index].celulas.map(celulaNavioRef => {                
+                var original = convertCelulaToString(celulaNavioOriginal)
+                var ref = convertCelulaToString(celulaNavioRef)                
+
+                if (original == ref){
                     navios[indexNavio].sentido = Math.floor(Math.random() * 2)
-                    return true
+                    retorno = true
                 }
             })
         })
     }
-    return false
+    return retorno
 }
 
 function celulasDosNavios() {
@@ -60,8 +74,9 @@ function celulasDosNavios() {
         if (indexNavio == 0){
             celulasDoNavio(indexNavio, navio)
         } else {
-            do
-                celulasDoNavio(indexNavio, navio)
+            do {
+                celulasDoNavio(indexNavio, navio)                
+            }
             while (colisao(indexNavio))            
         }
 
@@ -70,6 +85,8 @@ function celulasDosNavios() {
 }
 
 function celulasDoNavio(indexNavio,navio) {
+    navios[indexNavio].celulas = []
+    
     switch (navio.sentido) {
         case 0:
             var linha = Math.floor(Math.random() * (qtdeLinhas - tamanhoNavio))
@@ -80,8 +97,8 @@ function celulasDoNavio(indexNavio,navio) {
                 linha += 1
                 adicionarCelula(indexNavio,linha,coluna)                
             }
-
             break;
+
         case 1:
             var linha = Math.floor(Math.random() * qtdeLinhas)
             var coluna = Math.floor(Math.random() * (qtdeColunas - tamanhoNavio))
@@ -91,8 +108,6 @@ function celulasDoNavio(indexNavio,navio) {
                 coluna += 1
                 adicionarCelula(indexNavio,linha,coluna)
             }
-
-
             break;
     }
 }
@@ -119,11 +134,24 @@ function renderizarPlano() {
     for (let indexLinha = 0; indexLinha < qtdeLinhas; indexLinha++) {
         linhas += '<tr>'        
         for (let indexColuna = 0; indexColuna < qtdeColunas; indexColuna++) {
-            linhas += `<td class="cell" id="${indexLinha}.${indexColuna}">
-            ${indexLinha}.${indexColuna}
+            linhas += `<td class="cell" id="${indexLinha}.${indexColuna}" onclick="atirar('${indexLinha}.${indexColuna}')">
+            
             </td>`
         }
         linhas += '</tr>'
     }
     elemento.innerHTML = linhas
 }
+
+
+
+
+// colorirCelulasDosNavios()
+
+// function colorirCelulasDosNavios(){
+//     navios.map(navio => {
+//         navio.celulas.map(celula => {
+//             document.getElementById(convertCelulaToString(celula)).className = "cellNavio"
+//         })
+//     })
+// }
