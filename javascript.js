@@ -80,14 +80,22 @@ function atirar(elemento){
 
 function finalizarJogo(){
     document.getElementById("quadroFinal").style.visibility = "visible"
-    document.getElementById("fraseFinal").style.visibility = "visible"
+    document.getElementById("divFraseFinal").style.visibility = "visible"    
 
     if (score.sucesso.length == (qtdeNavios * tamanhoNavio)){
         document.getElementById("fraseFinal").style.color = "green"
-        document.getElementById("fraseFinal").innerText = "Você ganhou!"
+        document.getElementById("fraseFinal").innerHTML = '\
+            <span>Você ganhou!</span> \
+            <a href="#" onclick="window.location.reload(true);" style="font-size: 25px; font-weight: normal;margin-top:15px;"> \
+                Jogar novamente \
+            </a>'
     } else {
         document.getElementById("fraseFinal").style.color = "red"
-        document.getElementById("fraseFinal").innerText = "Você perdeu!"
+        document.getElementById("fraseFinal").innerHTML = '\
+            <span>Você perdeu!</span> \
+            <a href="#" onclick="window.location.reload(true);" style="font-size: 25px; font-weight: normal;margin-top:35px;"> \
+                Jogar novamente \
+            </a>'
     }
 }
 
